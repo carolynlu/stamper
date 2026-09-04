@@ -1,8 +1,6 @@
 import os
 import sqlite3
-import subprocess
 
-import git
 import requests
 from dotenv import load_dotenv
 from flask import Flask, abort, flash, redirect, render_template, request, url_for, jsonify
@@ -42,13 +40,18 @@ from app.models import Comment, User, db, History, Favorite
 from app.tenor import search_gif, featured_gifs
 from app.cache_tmdb import fetch_and_cache_movie, fetch_and_cache_show
 from app.history import add_to_history
+from app.create_media_db import seed_catalogue
 
 
 app = Flask(__name__)
 proxied = FlaskBehindProxy(app)
 
-app.config["SECRET_KEY"] = "SECRET_KEY"
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key")
+
+_db_url = os.getenv("DATABASE_URL", "sqlite:///site.db")
+if _db_url.startswith("postgres://"):
+    _db_url = _db_url.replace("postgres://", "postgresql://", 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = _db_url
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(PROJECT_ROOT)
@@ -67,8 +70,21 @@ login_manager.login_message_category = "info"
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
+def _needs_seeding(db_path):
+    if not os.path.exists(db_path):
+        return True
+    try:
+        conn = sqlite3.connect(db_path)
+        count = conn.execute("SELECT COUNT(*) FROM featured_movies").fetchone()[0]
+        conn.close()
+        return count == 0
+    except Exception:
+        return True
+
 with app.app_context():
     db.create_all()
+    if _needs_seeding(app.config["MEDIA_DB_PATH"]):
+        seed_catalogue(app.config["MEDIA_DB_PATH"])
 
 # Helper function to parse comment timestamp
 def parse_timestamp_string(ts_str):
@@ -761,21 +777,6 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for("login"))
-
-
-@app.route("/update_server", methods=["POST"])
-def webhook():
-    if request.method == "POST":
-        repo = git.Repo("/home/jalenseotechdev/stamper")
-        origin = repo.remotes.origin
-        origin.pull()
-
-        # Rebuild media.db
-        subprocess.run(["python3", "app/daily_update.py"])
-
-        return "Updated PythonAnywhere successfully", 200
-    else:
-        return "Wrong event type", 400
 
 
 if __name__ == "__main__":

@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: stamper
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app
+    envVars:
+      - key: TMDB_API_KEY
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: GENAI_KEY
+        sync: false
+      - key: TENOR_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: stamper-db
+          property: connectionString
+
+databases:
+  - name: stamper-db
+    plan: free

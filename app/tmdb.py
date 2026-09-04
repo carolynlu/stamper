@@ -33,13 +33,12 @@ def fetch_featured(media_type="movie", pages=2, count=100):
     return results
 
 # Extract necessary fields from TMDb movie/TV show data
-def parse_tmdb_items(items, media_type, include_rank=False):
+def parse_tmdb_items(items, media_type, include_rank=False, include_runtime=True):
     parsed = []
 
-    # For movies, get the runtime
     for i, item in enumerate(items):
         runtime = None
-        if media_type == "movie":
+        if media_type == "movie" and include_runtime:
             movie_url = f"{BASE_URL}/movie/{item['id']}"
             response = requests.get(
                 movie_url, params={"api_key": TMDB_API_KEY})
