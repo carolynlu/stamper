@@ -12,7 +12,7 @@ services:
         sync: false
       - key: GENAI_KEY
         sync: false
-      - key: TENOR_API_KEY
+      - key: GIPHY_API_KEY
         sync: false
       - key: DATABASE_URL
         fromDatabase:

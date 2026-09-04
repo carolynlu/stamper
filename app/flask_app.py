@@ -37,7 +37,7 @@ from app.google_ai import get_comments, summarize_comments
 
 from app.models import Comment, User, db, History, Favorite
 
-from app.tenor import search_gif, featured_gifs
+from app.giphy import search_gif, featured_gifs
 from app.cache_tmdb import fetch_and_cache_movie, fetch_and_cache_show
 from app.history import add_to_history
 from app.create_media_db import seed_catalogue
