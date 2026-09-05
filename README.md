@@ -1,6 +1,6 @@
 # Stamper 
 
-The project is deployed on PythonAnywhere: https://jalenseotechdev.pythonanywhere.com/
+The project is deployed on Render: https://stamper-ctrp.onrender.com/
 
 ### Table of Contents
 - [General Info](#general-info)
@@ -30,8 +30,9 @@ This project is created with:
 - [TMDb API](https://developer.themoviedb.org/docs/getting-started)
 - [Google GenAI API](https://ai.google.dev/)
 - [AniList API](https://docs.anilist.co/)
-- [Tenor API](https://tenor.com/gifapi)
-- SQLite3
+- [Giphy API](https://developers.giphy.com/docs/api/)
+- SQLite3 (media catalog)
+- PostgreSQL (user data)
 - dotenv
 
 
@@ -51,7 +52,7 @@ Create a .env file in the root directory and add your API keys
 # Example .env file
 TMDB_API_KEY=your_tmdb_key
 GENAI_KEY=your_genai_key
-TENOR_API_KEY=your_tenor_key
+GIPHY_API_KEY=your_giphy_key
 ```
 
 
