@@ -158,30 +158,43 @@ def seed_catalogue(db_path):
 
     Episodes and runtimes are deferred to on-demand cache (cache_tmdb.py).
     Safe to call repeatedly; all inserts use INSERT OR REPLACE.
+    Each section is wrapped so one API failure doesn't prevent the app from starting.
     """
     conn = sqlite3.connect(db_path)
     conn.execute("PRAGMA journal_mode=WAL")
     create_tables(conn)
 
-    print("[seed_catalogue] Fetching featured movies...")
-    raw_movies = fetch_featured("movie", pages=2)
-    featured_movies = parse_tmdb_items(raw_movies, "movie", include_rank=True, include_runtime=False)
-    insert_featured(conn, "featured_movies", featured_movies)
-    conn.commit()
+    try:
+        print("[seed_catalogue] Fetching featured movies...")
+        raw_movies = fetch_featured("movie", pages=2)
+        featured_movies = parse_tmdb_items(raw_movies, "movie", include_rank=True, include_runtime=False)
+        insert_featured(conn, "featured_movies", featured_movies)
+        conn.commit()
+        print(f"[seed_catalogue] {len(featured_movies)} movies seeded.")
+    except Exception as e:
+        print(f"[seed_catalogue] WARNING: failed to seed movies: {e}")
 
-    print("[seed_catalogue] Fetching featured TV shows...")
-    raw_tv = fetch_featured("tv", pages=2)
-    featured_tv = parse_tmdb_items(raw_tv, "tv", include_rank=True, include_runtime=False)
-    insert_featured(conn, "featured_tv", featured_tv)
-    conn.commit()
+    try:
+        print("[seed_catalogue] Fetching featured TV shows...")
+        raw_tv = fetch_featured("tv", pages=2)
+        featured_tv = parse_tmdb_items(raw_tv, "tv", include_rank=True, include_runtime=False)
+        insert_featured(conn, "featured_tv", featured_tv)
+        conn.commit()
+        print(f"[seed_catalogue] {len(featured_tv)} TV shows seeded.")
+    except Exception as e:
+        print(f"[seed_catalogue] WARNING: failed to seed TV shows: {e}")
 
-    print("[seed_catalogue] Fetching anime...")
-    anime_data = parse_anime(fetch_anime(pages=1))
-    insert_anime(conn, anime_data)
-    conn.commit()
+    try:
+        print("[seed_catalogue] Fetching anime...")
+        anime_data = parse_anime(fetch_anime(pages=1))
+        insert_anime(conn, anime_data)
+        conn.commit()
+        print(f"[seed_catalogue] {len(anime_data)} anime seeded.")
+    except Exception as e:
+        print(f"[seed_catalogue] WARNING: failed to seed anime: {e}")
 
     conn.close()
-    print(f"[seed_catalogue] Done: {len(featured_movies)} movies, {len(featured_tv)} TV, {len(anime_data)} anime.")
+    print("[seed_catalogue] Done.")
 
 
 if __name__ == "__main__":

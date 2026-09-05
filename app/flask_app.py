@@ -84,7 +84,10 @@ def _needs_seeding(db_path):
 with app.app_context():
     db.create_all()
     if _needs_seeding(app.config["MEDIA_DB_PATH"]):
-        seed_catalogue(app.config["MEDIA_DB_PATH"])
+        try:
+            seed_catalogue(app.config["MEDIA_DB_PATH"])
+        except Exception as e:
+            print(f"[startup] WARNING: seed_catalogue failed: {e}")
 
 # Helper function to parse comment timestamp
 def parse_timestamp_string(ts_str):
