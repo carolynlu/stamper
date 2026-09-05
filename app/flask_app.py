@@ -269,7 +269,10 @@ def view_movie(movie_id):
     )
 
     comment_block = get_comments(movie_id)
-    emoji_summary = summarize_comments(comment_block) if comment_block else ""
+    try:
+        emoji_summary = summarize_comments(comment_block) if comment_block else ""
+    except Exception:
+        emoji_summary = ""
     user_favorites = get_user_favorites()
     
     return render_template(
@@ -328,8 +331,11 @@ def view_episode(episode_id):
     )
 
     comment_block = get_comments(episode_id)
-    emoji_summary = summarize_comments(comment_block) if comment_block else ""
-    
+    try:
+        emoji_summary = summarize_comments(comment_block) if comment_block else ""
+    except Exception:
+        emoji_summary = ""
+
     return render_template(
         "media_page.html",
         media=episode,
@@ -426,8 +432,11 @@ def view_anime_episode(episode_id):
     )
 
     comment_block = get_comments(episode_id)
-    emoji_summary = summarize_comments(comment_block) if comment_block else ""
-    user_favorites = get_user_favorites()  # Add this line
+    try:
+        emoji_summary = summarize_comments(comment_block) if comment_block else ""
+    except Exception:
+        emoji_summary = ""
+    user_favorites = get_user_favorites()
     return render_template(
         "media_page.html",
         media=episode,

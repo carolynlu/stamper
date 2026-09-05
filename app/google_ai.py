@@ -51,7 +51,7 @@ def summarize_comments(comment_block):
     """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.6-flash",
         config=types.GenerateContentConfig(
             system_instruction=(
                 "You are a helpful assistant. Only print those 4 emojis"
