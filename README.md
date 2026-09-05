@@ -40,7 +40,7 @@ This project is created with:
 In the terminal:
 ``` bash
 # Clone the repository
-git clone https://github.com/jalenjaloney/stamper.git
+git clone https://github.com/carolynlu/stamper.git
 cd stamper/
 
 # Install Python dependencies
