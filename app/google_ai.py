@@ -2,41 +2,25 @@ import os
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
-import sqlite3
 
 load_dotenv()
 
-# Fetches timestamped comments for given episode/movie from SQLite database.
 def get_comments(media_id, db_path=None):
-    # Determine path to database
-    if not db_path:
-        db_path = os.path.join(os.path.dirname(
-            __file__), "..", "instance", "site.db")
-    
-    # Connect to SQLite database
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-
-    # query all comments of episode/movie, sorted by time
-    cursor.execute(
-        """
-        SELECT timestamp, content
-        FROM comment
-        WHERE episode_id = ?
-        ORDER BY timestamp ASC
-    """,
-        (media_id,),
+    from app.models import Comment
+    rows = (
+        Comment.query
+        .filter_by(episode_id=media_id)
+        .order_by(Comment.timestamp.asc())
+        .all()
     )
 
-    comments = cursor.fetchall()
-    conn.close()
-
-    if not comments:
+    if not rows:
         return ""
 
     formatted = []
-    for seconds, content in comments:
-        seconds = int(seconds)
+    for comment in rows:
+        seconds = int(comment.timestamp)
+        content = comment.content
         hours = seconds // 3600
         minutes = (seconds % 3600) // 60
         secs = seconds % 60
